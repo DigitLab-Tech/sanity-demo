@@ -16,6 +16,7 @@ import {
   type DocumentLocation,
 } from 'sanity/presentation'
 import {assist} from '@sanity/assist'
+import {documentInternationalization} from '@sanity/document-internationalization'
 
 // Environment variables for project configuration
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
@@ -51,8 +52,15 @@ export default defineConfig({
 
   projectId,
   dataset,
-
   plugins: [
+    documentInternationalization({
+      supportedLanguages: [
+        {id: 'fr-ca', title: 'French - CA'},
+        {id: 'en-ca', title: 'English - CA'},
+        {id: 'en-us', title: 'English - US'},
+      ],
+      schemaTypes: ['page'],
+    }),
     // Presentation tool configuration for Visual Editing
     presentationTool({
       previewUrl: {
