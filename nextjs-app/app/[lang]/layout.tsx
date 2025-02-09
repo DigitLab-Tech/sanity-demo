@@ -1,4 +1,4 @@
-import "./globals.css";
+import "../globals.css";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
@@ -14,7 +14,7 @@ import * as demo from "@/sanity/lib/demo";
 import { sanityFetch, SanityLive } from "@/sanity/lib/live";
 import { settingsQuery } from "@/sanity/lib/queries";
 import { resolveOpenGraphImage } from "@/sanity/lib/utils";
-import { handleError } from "./client-utils";
+import { handleError } from "../client-utils";
 
 /**
  * Generate metadata for the page.
@@ -59,10 +59,14 @@ const inter = Inter({
 
 export default async function RootLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: any;
 }) {
   const { isEnabled: isDraftMode } = await draftMode();
+
+  console.log((await params).lang);
 
   return (
     <html lang="en" className={`${inter.variable} bg-white text-black`}>
