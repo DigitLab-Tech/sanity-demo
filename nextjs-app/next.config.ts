@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
     SC_DISABLE_SPEEDY: "false",
   },
   i18n: {
-    locales: ["default", "fr-CA", "en-CA", "en-US"],
-    defaultLocale: "default",
+    locales: ["fr-CA", "en-CA", "en-US"],
+    defaultLocale: "fr-CA",
     localeDetection: false,
   },
   trailingSlash: true,
