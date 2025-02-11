@@ -28,13 +28,19 @@ const linkFields = /* groq */ `
 `;
 
 export const getPageQuery = defineQuery(`
-  *[_type == 'page' && slug.current == $slug][0]{
+  *[_type == 'page' && slug.current == $slug && language == $lang][0]{
     _id,
     _type,
     name,
     slug,
     heading,
     subheading,
+    language,
+      "_translations": *[_type == "translation.metadata" && references(^._id)].translations[].value->{
+    name,
+    slug,
+    language
+  },
     "pageBuilder": pageBuilder[]{
       ...,
       _type == "callToAction" => {
@@ -94,4 +100,20 @@ export const postPagesSlugs = defineQuery(`
 export const pagesSlugs = defineQuery(`
   *[_type == "page" && defined(slug.current)]
   {"slug": slug.current}
+`);
+
+export const globalSearchQuery = defineQuery(`
+    *[_type in ["page", 'post'] 
+    && (
+    title match $queryString + '*' 
+    || name match $queryString + '*')] 
+    | order(publishedAt desc){
+      title,
+      name, 
+      bio,
+      body,
+      'slug' : slug.current,
+      description,
+      'type': _type,
+    }
 `);

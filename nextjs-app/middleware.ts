@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_FILE = /\.(.*)$/;
-
 export async function middleware(req: NextRequest) {
+  const PUBLIC_FILE = /\.(.*)$/;
+  const defaultLocale = (
+    process.env.NEXT_PUBLIC_DEFAULT_LOCALE ||
+    req.cookies.get("NEXT_LOCALE")?.value ||
+    "en"
+  ).toLowerCase();
+  const locales = (process.env.NEXT_PUBLIC_LOCALES || defaultLocale)
+    .toLowerCase()
+    .split(",");
+  const currentLocale = req.nextUrl.pathname.split("/")[1].toLocaleLowerCase();
+
   if (
     req.nextUrl.pathname.startsWith("/_next") ||
     req.nextUrl.pathname.includes("/api/") ||
@@ -11,13 +20,15 @@ export async function middleware(req: NextRequest) {
     return;
   }
 
-  console.log(req.nextUrl);
-
-  if (req.nextUrl.locale === "default") {
-    const locale = req.cookies.get("NEXT_LOCALE")?.value || "fr-ca";
-
+  if (!currentLocale || !locales.includes(currentLocale)) {
     return NextResponse.redirect(
-      new URL(`/${locale}${req.nextUrl.pathname}${req.nextUrl.search}`, req.url)
+      new URL(
+        `/${defaultLocale}${req.nextUrl.pathname.replace(
+          "/" + currentLocale,
+          ""
+        )}${req.nextUrl.search}`,
+        req.url
+      )
     );
   }
 }

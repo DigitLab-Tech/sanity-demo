@@ -20,6 +20,16 @@ import { handleError } from "../client-utils";
  * Generate metadata for the page.
  * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
  */
+
+export async function generateStaticParams() {
+  const locales = process.env.NEXT_PUBLIC_LOCALES || "fr-CA";
+  return [
+    locales.split(",").map((locale) => {
+      return { lang: locale };
+    }),
+  ];
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const { data: settings } = await sanityFetch({
     query: settingsQuery,
@@ -62,14 +72,13 @@ export default async function RootLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: any;
+  params: Promise<{ lang: string }>;
 }) {
   const { isEnabled: isDraftMode } = await draftMode();
-
-  console.log((await params).lang);
+  const locale = (await params).lang.toLowerCase();
 
   return (
-    <html lang="en" className={`${inter.variable} bg-white text-black`}>
+    <html lang={locale} className={`${inter.variable} bg-white text-black`}>
       <body>
         <section className="min-h-screen pt-24">
           {/* The <Toaster> component is responsible for rendering toast notifications used in /app/client-utils.ts and /app/components/DraftModeToast.tsx */}
@@ -83,7 +92,14 @@ export default async function RootLayout({
           )}
           {/* The <SanityLive> component is responsible for making all sanityFetch calls in your application live, so should always be rendered. */}
           <SanityLive onError={handleError} />
-          <Header />
+          <Header
+            currentLocale={locale}
+            locales={
+              process.env.NEXT_PUBLIC_LOCALES?.toLowerCase().split(",") || [
+                locale,
+              ]
+            }
+          />
           <main className="">{children}</main>
           <Footer />
         </section>
